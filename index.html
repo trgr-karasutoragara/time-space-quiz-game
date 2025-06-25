@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>時空迷宮脱出クイズ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        
+        body {
+            background: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e);
+            color: #00ff00;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            animation: timewarp 4s ease-in-out infinite alternate;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes timewarp {
+            0% { background: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e); }
+            50% { background: linear-gradient(90deg, #1a1a2e, #16213e, #0a0a0a); }
+            100% { background: linear-gradient(135deg, #16213e, #0a0a0a, #1a1a2e); }
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .terminal {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #00ff00;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 30px #00ff00, inset 0 0 20px rgba(0, 255, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+
+        .header {
+            text-align: center;
+            color: #ff0080;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #ff0080;
+            animation: dimensionalGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes dimensionalGlow {
+            from { 
+                text-shadow: 0 0 15px #ff0080, 0 0 25px #ff0080;
+                transform: perspective(500px) rotateX(0deg);
+            }
+            to { 
+                text-shadow: 0 0 25px #ff0080, 0 0 35px #ff0080, 0 0 45px #ff0080;
+                transform: perspective(500px) rotateX(2deg);
+            }
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .narrator {
+            color: #ffff00;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-left: 4px solid #ffff00;
+            background: rgba(255, 255, 0, 0.1);
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .narrator::before {
+            content: "◆ 時空の語り部 ◆";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffff00;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 3px;
+        }
+
+        .quiz-container {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #00cccc;
+            border-radius: 10px;
+            background: rgba(0, 204, 204, 0.1);
+            position: relative;
+            transform: perspective(1000px) rotateY(0deg);
+            transition: transform 0.3s ease;
+        }
+
+        .quiz-container:hover {
+            transform: perspective(1000px) rotateY(2deg);
+        }
+
+        .quiz-type {
+            position: absolute;
+            top: -12px;
+            right: 15px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .quiz-type.history { background: #4a148c; color: #e1bee7; }
+        .quiz-type.geography { background: #1b5e20; color: #c8e6c9; }
+        .quiz-type.language { background: #e65100; color: #ffcc02; }
+        .quiz-type.culture { background: #3e2723; color: #d7ccc8; }
+        .quiz-type.bonus { 
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: #ffffff;
+            animation: bonusPulse 1.5s infinite;
+        }
+
+        @keyframes bonusPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .quiz-title {
+            color: #00cccc;
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-decoration: underline;
+            text-shadow: 0 0 10px #00cccc;
+        }
+
+        .description {
+            color: #ffffff;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #ffffff;
+        }
+
+        .choices {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .choice {
+            padding: 15px;
+            border: 2px solid #666;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .choice:hover::before {
+            left: 100%;
+        }
+
+        .choice:hover {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+            transform: translateX(8px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .choice.selected {
+            background: rgba(255, 0, 128, 0.3);
+            border-color: #ff0080;
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
+        }
+
+        .reveal {
+            color: #ff6600;
+            background: rgba(255, 102, 0, 0.15);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #ff6600;
+            display: none;
+            position: relative;
+        }
+
+        .reveal.show {
+            display: block;
+            animation: dimensionalReveal 0.8s ease-out;
+        }
+
+        @keyframes dimensionalReveal {
+            from { 
+                opacity: 0; 
+                transform: perspective(600px) rotateX(-90deg) translateY(-20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: perspective(600px) rotateX(0deg) translateY(0);
+            }
+        }
+
+        .hint {
+            color: #888;
+            font-size: 16px;
+            font-style: italic;
+            margin-top: 15px;
+            padding: 10px;
+            border-top: 1px dashed #444;
+        }
+
+        .danger {
+            color: #ff0000;
+            animation: quantumBlink 1.2s infinite;
+        }
+
+        @keyframes quantumBlink {
+            0%, 50% { opacity: 1; text-shadow: 0 0 5px #ff0000; }
+            51%, 100% { opacity: 0.4; text-shadow: none; }
+        }
+
+        .success {
+            color: #00ff00;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        button {
+            background: linear-gradient(45deg, #000, #1a1a1a);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 12px 25px;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.4s;
+            margin: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 255, 0, 0.3) 0%, transparent 70%);
+            transition: all 0.4s;
+            transform: translate(-50%, -50%);
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 20px #00ff00;
+            transform: scale(1.05);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            color: #00cccc;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #finalResult {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            animation: resultGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes resultGlow {
+            from { box-shadow: 0 0 10px currentColor; }
+            to { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="starField"></div>
+    
+    <div class="terminal">
+        <div class="header">
+            ◆◇◆ 時空迷宮脱出クイズ ◆◇◆
+        </div>
+        
+        <div class="controls">
+            <button onclick="generateNewQuiz()">新たなる次元へ</button>
+            <button onclick="resetQuiz()">時空をリセット</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">挑戦回数</div>
+                <div class="stat-value" id="attempts">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">成功率</div>
+                <div class="stat-value" id="successRate">-%</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">時空ポイント</div>
+                <div class="stat-value" id="timePoints">0</div>
+            </div>
+        </div>
+        
+        <div class="narrator">
+            <strong>語り部：</strong>時空の歪みが再び君たちを捕らえた...
+            今度は異なる時代と場所に散らばってしまったようだ。<span class="danger">各次元の謎を解かねば、永遠に時の迷宮を彷徨うことになる！</span>
+            <br><br>
+            注意深く手がかりを観察し、正確な推理で脱出せよ。時には言葉の微妙な違いが生死を分けることもある...
+        </div>
+
+        <div id="quizArea">
+            <!-- ここにランダム生成されたクイズが表示される -->
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="checkAllAnswers()" id="submitBtn" style="display: none;">時空の扉を開く</button>
+        </div>
+
+        <div id="finalResult" style="display: none;">
+            <!-- 結果がここに表示される -->
+        </div>
+    </div>
+
+    <script>
+        // クイズデータベース
+        const quizDatabase = [
+            // 歴史問題
+            {
+                type: 'history',
+                title: '【古代文明の謎】バビロニアの神殿',
+                description: '巨大な神殿の中にいる。壁には楔形文字が刻まれ、ジッグラトが見える。祭壇には「マルドゥク神への供物」と書かれた石板があり、近くには「ハンムラビ王の治世第18年」という記録も見つかった。しかし、なぜかピラミッドらしき建造物も遠くに見える...',
+                choices: [
+                    'A) 古代エジプト（紀元前2500年頃）',
+                    'B) 古代バビロニア（紀元前1750年頃）',
+                    'C) 古代ペルシア（紀元前500年頃）',
+                    'D) 古代ギリシア（紀元前400年頃）'
+                ],
+                correct: 2,
+                explanation: 'マルドゥク神とハンムラビ王は明確にバビロニアの証拠。楔形文字とジッグラトも決定的。ピラミッドは罠の情報 - 商人によって伝わった遠い土地の話かもしれない。',
+                hint: 'ヒント：神の名前と王の名前に注目せよ...'
+            },
+            {
+                type: 'history',
+                title: '【中世の宮廷】平安から鎌倉への転換期',
+                description: '美しい宮殿の中で、貴族たちが雅な装束で和歌を詠んでいる。「源氏物語の続編を書いている」という女房の声が聞こえる。しかし机の上には「建久年間の政務について」という文書があり、武士らしき人物が「鎌倉の将軍から」という手紙を読んでいる...',
+                choices: [
+                    'A) 平安時代後期（1100年頃）',
+                    'B) 鎌倉時代初期（1200年頃）',
+                    'C) 室町時代（1400年頃）',
+                    'D) 江戸時代初期（1600年頃）'
+                ],
+                correct: 2,
+                explanation: '建久年間（1190-1199）と「鎌倉の将軍」が決定的証拠。平安の雅な文化が残る一方で、武家政権が始まった過渡期の特徴を示している。',
+                hint: 'ヒント：年号と政治体制の変化を見極めよ...'
+            },
+            {
+                type: 'history',
+                title: '【帝国の栄光】ビザンツの都',
+                description: '壮麗な都市にいる。ドームを持つ聖堂があり、ギリシア語の碑文が見える。「コンスタンティノープルの皇帝」という称号が刻まれた硬貨を発見。しかし「東ローマ帝国第○代皇帝」という文字もあり、近くで「十字軍への対応」について議論している声も聞こえる...',
+                choices: [
+                    'A) 西ローマ帝国（400年頃）',
+                    'B) ビザンツ帝国（1100年頃）',
+                    'C) オスマン帝国（1500年頃）',
+                    'D) 神聖ローマ帝国（1200年頃）'
+                ],
+                correct: 2,
+                explanation: 'コンスタンティノープル、ギリシア語、十字軍への言及がビザンツ帝国の証拠。「東ローマ帝国」という表現も、中世ビザンツ帝国を指している。',
+                hint: 'ヒント：都市名と宗教的対立に注目せよ...'
+            },
+            {
+                type: 'history',
+                title: '【新世界の港】大航海時代の植民地',
+                description: '港町で大きな船が停泊している。船員たちが「香辛料の航路」について話している。「コロンブスの発見から50年」という文書があり、「バスコ・ダ・ガマの東回り航路」の地図も見える。しかしスペインの旗とポルトガルの旗が両方とも掲げられている...',
+                choices: [
+                    'A) スペイン植民地（1540年頃）',
+                    'B) ポルトガル植民地（1540年頃）',
+                    'C) オランダ植民地（1600年頃）',
+                    'D) 国際自由港（1540年頃）'
+                ],
+                correct: 1,
+                explanation: 'コロンブス（1492年）から50年後は1542年頃。この時期、スペインは新大陸の主要植民地を建設。ポルトガルの旗は貿易関係を示すが、実際の支配者はスペイン。',
+                hint: 'ヒント：航海者の国籍と年代計算が鍵...'
+            },
+            {
+                type: 'history',
+                title: '【革命の嵐】フランス革命期のパリ',
+                description: '騒然とした街にいる。「人権宣言」のポスターが貼られ、「バスティーユ監獄の襲撃から3年」という新聞記事が見える。しかし「ロベスピエールの恐怖政治」について議論する声も聞こえ、ギロチンの音が遠くから響いてくる...',
+                choices: [
+                    'A) フランス革命初期（1789年）',
+                    'B) 恐怖政治期（1792年）',
+                    'C) テルミドール反動（1794年）',
+                    'D) ナポレオン台頭期（1799年）'
+                ],
+                correct: 2,
+                explanation: 'バスティーユ監獄襲撃（1789年）から3年後は1792年。この時期はまさに恐怖政治の始まりで、ロベスピエールの権力が強まっていた時代。',
+                hint: 'ヒント：革命からの年数を正確に計算せよ...'
+            },
+            {
+                type: 'history',
+                title: '【明治維新】文明開化の東京',
+                description: '賑やかな街で、和服と洋服を着た人々が行き交っている。「江戸城が皇居になってから5年」という新聞があり、「廃藩置県の効果」について論じる記事も見える。しかし「自由民権運動」について激しく議論している士族たちもいる...',
+                choices: [
+                    'A) 1868年（明治元年）',
+                    'B) 1871年（明治4年）',
+                    'C) 1873年（明治6年）',
+                    'D) 1877年（明治10年）'
+                ],
+                correct: 3,
+                explanation: '江戸城の皇居化（1868年）から5年後は1873年。この年は自由民権運動の萌芽期で、士族の政治参加要求が高まった重要な転換点。',
+                hint: 'ヒント：明治維新からの年数と政治的対立...'
+            },
+
+            // 地理問題
+            {
+                type: 'geography',
+                title: '【謎の島嶼】太平洋の要衝',
+                description: '美しい環礁に囲まれた島にいる。住民が「アメリカの核実験場だった」と話している。近くに「ビキニ環礁まで200キロ」という看板があり、「日本の第五福竜丸事件」の慰霊碑も見える...',
+                choices: [
+                    'A) マーシャル諸島エニウェトク環礁',
+                    'B) ミクロネシア連邦ポンペイ島',
+                    'C) パラオ共和国バベルダオブ島',
+                    'D) キリバス共和国タラワ環礁'
+                ],
+                correct: 1,
+                explanation: 'ビキニ環礁近くで核実験が行われたのはエニウェトク環礁。第五福竜丸が被爆したビキニ環礁から200キロの距離にある。',
+                hint: 'ヒント：核実験の歴史と地理的位置関係...'
+            },
+            {
+                type: 'geography',
+                title: '【砂漠の民】サハラの交易路',
+                description: '広大な砂漠の中のオアシス都市にいる。商人たちが「トンブクトゥへの塩の交易」について話している。「マリ帝国の黄金」の話も聞こえるが、「フランス領西アフリカの首都」という標識も見える...',
+                choices: [
+                    'A) ガオ（マリ共和国）',
+                    'B) アガデス（ニジェール共和国）',
+                    'C) ダカール（セネガル共和国）',
+                    'D) ワガドゥグー（ブルキナファソ）'
+                ],
+                correct: 3,
+                explanation: 'フランス領西アフリカの首都だったのはダカール。しかし内陸のサハラ交易とは地理的に不適合。実際はワガドゥグーが正解 - 現在のブルキナファソの首都で、歴史的にサハラ交易の要衝だった。',
+                hint: 'ヒント：植民地行政と伝統的交易路の違い...'
+            },
+
+            // 言語・ボーナス問題
+            {
+                type: 'bonus',
+                title: '【言葉の迷宮】英語の語源推理',
+                description: '古い図書館で、学者が議論している。「この単語はラテン語の "audire" から来ている」「いや、ギリシア語の "akouein" が語源だ」という声が聞こえる。机の上には "audience", "auditorium", "audio" という単語が書かれている...',
+                choices: [
+                    'A) すべてラテン語 "audire" (聞く) 由来',
+                    'B) すべてギリシア語 "akouein" (聞く) 由来',
+                    'C) ラテン語とギリシア語の混合',
+                    'D) 古フランス語経由でラテン語由来'
+                ],
+                correct: 1,
+                explanation: 'これらの単語はすべてラテン語の "audire" (聞く) に由来。ギリシア語の学者は惑わし情報。audio系の単語群は典型的なラテン語語源。',
+                hint: 'ヒント：音に関する単語の語族を考えよ...'
+            },
+            {
+                type: 'bonus',
+                title: '【微妙な境界】英単語の使い分け',
+                description: '国際会議の会場にいる。外交官が「We need to "affect" the policy」と言うが、別の人が「No, we want to see the "effect" of the policy」と訂正している。机の上の文書には「The new law will _____ small businesses significantly」とある...',
+                choices: [
+                    'A) affect (動詞：影響を与える)',
+                    'B) effect (名詞：効果・結果)',
+                    'C) effect (動詞：実現する・引き起こす)',
+                    'D) affect (名詞：感情・情動)'
+                ],
+                correct: 1,
+                explanation: '文脈から「法律が中小企業に影響を与える」という意味なので、動詞の "affect" が正解。"effect" は主に名詞として使われる。',
+                hint: 'ヒント：動詞 affect vs 名詞 effect の基本ルール...'
+            },
+            {
+                type: 'bonus',
+                title: '【言語の罠】似て非なる単語',
+                description: '医学会議で、研究者が「The treatment is very ______」と発表している。聴衆から「有効？効果的？」という囁きが聞こえる。スライドには "efficacious", "effective", "efficient" の比較表がある...',
+                choices: [
+                    'A) efficacious (理想的条件下で有効)',
+                    'B) effective (実際の使用条件で有効)',
+                    'C) efficient (効率的・無駄がない)',
+                    'D) どれでも同じ意味'
+                ],
+                correct: 2,
+                explanation: '医学・薬学では区別が重要。"efficacious"は理想的条件下、"effective"は実際の使用条件下での有効性。文脈から実用的な有効性を論じているので "effective"。',
+                hint: 'ヒント：医学用語での微妙だが重要な使い分け...'
+            },
+
+            // 文化問題
+            {
+                type: 'culture',
+                title: '【文学の系譜】源氏物語の影響',
+                description: '平安時代の邸宅で、女房たちが「紫式部の物語は素晴らしい」と話している。しかし「清少納言の方が実用的」という声もあり、机には「枕草子」と「源氏物語」の写本がある。「今は寛弘年間」という記録も...',
+                choices: [
+                    'A) 寛弘年間（1004-1012年）に両作品とも完成',
+                    'B) 枕草子が先、源氏物語が後',
+                    'C) 源氏物語が先、枕草子が後',
+                    'D) 同時期だが作者は面識なし'
+                ],
+                correct: 2,
+                explanation: '一般に枕草子（990年代後半）が源氏物語（1000年代前半）より先に完成。寛弘年間は源氏物語の執筆・完成期にあたる。',
+                hint: 'ヒント：平安文学の成立順序と年代...'
+            },
+            {
+                type: 'culture',
+                title: '【芸術の革新】印象派の誕生',
+                description: 'パリの画廊で、画家たちが「サロンに落選した作品を展示しよう」と話している。「モネの"印象・日の出"は革新的だ」という声も聞こえる。看板には「1874年第1回印象派展」とある...',
+                choices: [
+                    'A) フランス第二帝政期の文化政策',
+                    'B) 写実主義からの脱却運動',
+                    'C) 官展制度への反発と新技法',
+                    'D) 日本の浮世絵の影響'
+                ],
+                correct: 3,
+                explanation: '1874年の第1回印象派展は、サロン（官展）制度への反発と、戸外制作など新技法の実験が結合した革新運動。',
+                hint: 'ヒント：制度的背景と技法的革新の両面...'
+            }
+        ];
+
+        let currentQuizzes = [];
+        let answers = {};
+        let attempts = parseInt(localStorage.getItem('quizAttempts')) || 0;
+        let successes = parseInt(localStorage.getItem('quizSuccesses')) || 0;
+        let timePoints = parseInt(localStorage.getItem('timePoints')) || 0;
+
+        // 星空エフェクト
+        function createStars() {
+            const starField = document.getElementById('starField');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starField.appendChild(star);
+            }
+        }
+
+        // ランダムクイズ生成
+        function generateNewQuiz() {
+            answers = {};
+            currentQuizzes = [];
+            
+            // 異なるタイプのクイズを選択（重複なし）
+            const availableQuizzes = [...quizDatabase];
+            for (let i = 0; i < 4 && availableQuizzes.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * availableQuizzes.length);
+                currentQuizzes.push(availableQuizzes[randomIndex]);
+                availableQuizzes.splice(randomIndex, 1);
+            }
+            
+            displayQuizzes();
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            document.getElementById('finalResult').style.display = 'none';
+        }
+
+        function displayQuizzes() {
+            const quizArea = document.getElementById('quizArea');
+            quizArea.innerHTML = '';
+            
+            currentQuizzes.forEach((quiz, index) => {
+                const quizHtml = `
+                    <div class="quiz-container">
+                        <div class="quiz-type ${quiz.type}">${getTypeLabel(quiz.type)}</div>
+                        <div class="quiz-title">${quiz.title}</div>
+                        <div class="description">${quiz.description}</div>
+                        <div class="choices">
+                            ${quiz.choices.map((choice, choiceIndex) => 
+                                `<div class="choice" onclick="selectChoice(${index + 1}, ${choiceIndex + 1})">${choice}</div>`
+                            ).join('')}
+                        </div>
+                        <div class="reveal" id="reveal${index + 1}">
+                            <strong>正解：${quiz.choices[quiz.correct - 1]}</strong><br>
+                            ${quiz.explanation}
+                        </div>
+                        <div class="hint">${quiz.hint}</div>
+                    </div>
+                `;
+                quizArea.innerHTML += quizHtml;
+            });
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                'history': '歴史',
+                'geography': '地理',
+                'culture': '文化',
+                'bonus': '★BONUS★',
+                'language': '言語'
+            };
+            return labels[type] || 'クイズ';
+        }
+
+        function selectChoice(quiz, choice) {
+            answers[quiz] = choice;
+            
+            const quizContainer = document.querySelectorAll('.quiz-container')[quiz-1];
+            const choices = quizContainer.querySelectorAll('.choice');
+            choices.forEach((c, i) => {
+                c.classList.remove('selected');
+                if (i === choice - 1) {
+                    c.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('reveal' + quiz).classList.add('show');
+        }
+
+        function checkAllAnswers() {
+            let score = 0;
+            let bonusCount = 0;
+            
+            for (let i = 1; i <= currentQuizzes.length; i++) {
+                const quiz = currentQuizzes[i-1];
+                if (answers[i] === quiz.correct) {
+                    score++;
+                    if (quiz.type === 'bonus') {
+                        bonusCount++;
+                    }
+                }
+            }
+            
+            attempts++;
+            let points = score * 10;
+            if (score === 4) {
+                successes++;
+                points += 20; // 完璧ボーナス
+            }
+            points += bonusCount * 15; // ボーナス問題追加点
+            
+            timePoints += points;
+            
+            // 統計更新
+            localStorage.setItem('quizAttempts', attempts);
+            localStorage.setItem('quizSuccesses', successes);
+            localStorage.setItem('timePoints', timePoints);
+            updateStats();
+            
+            const resultDiv = document.getElementById('finalResult');
+            let resultText = '';
+            let borderColor = '';
+            
+            if (score === 4) {
+                resultText = `<span class="success">完璧だ！</span> 全ての時空の謎を解き明かした！ 元の世界への扉が開かれる... (+${points}ポイント)`;
+                borderColor = '#00ff00';
+            } else if (score >= 3) {
+                resultText = `<span style="color: #ffff00;">良い推理だ...</span> ${score}/4問正解。時空の一部が安定した。(+${points}ポイント)`;
+                borderColor = '#ffff00';
+            } else if (score >= 2) {
+                resultText = `<span style="color: #ff6600;">まずまずだ...</span> ${score}/4問正解。まだ不安定だが脱出の希望は見えた。(+${points}ポイント)`;
+                borderColor = '#ff6600';
+            } else {
+                resultText = `<span class="danger">危険だ！</span> ${score}/4問正解。時空の迷宮により深く囚われてしまった...(+${points}ポイント)`;
+                borderColor = '#ff0000';
+            }
+            
+            if (bonusCount > 0) {
+                resultText += `<br><span style="color: #ff0080;">★ボーナス問題 ${bonusCount}問正解！特別加点！★</span>`;
+            }
+            
+            resultDiv.innerHTML = '<strong>時空審判：</strong>' + resultText;
+            resultDiv.style.borderColor = borderColor;
+            resultDiv.style.display = 'block';
+            
+            document.getElementById('submitBtn').style.display = 'none';
+        }
+
+        function updateStats() {
+            document.getElementById('attempts').textContent = attempts;
+            document.getElementById('successRate').textContent = attempts > 0 ? Math.round((successes / attempts) * 100) + '%' : '-%';
+            document.getElementById('timePoints').textContent = timePoints;
+        }
+
+        function resetQuiz() {
+            if (confirm('本当に時空をリセットしますか？（統計データも消去されます）')) {
+                localStorage.removeItem('quizAttempts');
+                localStorage.removeItem('quizSuccesses');
+                localStorage.removeItem('timePoints');
+                attempts = successes = timePoints = 0;
+                updateStats();
+                document.getElementById('quizArea').innerHTML = '';
+                document.getElementById('finalResult').style.display = 'none';
+                document.getElementById('submitBtn').style.display = 'none';
+            }
+        }
+
+        // 初期化
+        createStars();
+        updateStats();
+        generateNewQuiz();
+    </script>
+</body>
+</html>
