@@ -22,6 +22,10 @@ This quiz system transforms learning into an **active investigation game** where
 - **Investigation Teams** must use critical thinking and knowledge synthesis
 - **Competition dynamics** naturally emerge, driving deeper engagement
 
+## 🎮 Try It Out
+🌌 [Play the Demo](https://trgr-karasutoragara.github.io/time-space-quiz-game/)
+Experience the time-space labyrinth yourself! No installation required—just open in your browser and start solving temporal mysteries.
+
 ## 🎮 Game Mechanics
 
 ### Core Gameplay Loop
