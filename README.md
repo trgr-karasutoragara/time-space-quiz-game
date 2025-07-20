@@ -1,9 +1,10 @@
 # time-space-quiz-game
 *An Educational Gamification Prototype for Historical & Cultural Learning*
 
-![Demo](https://img.shields.io/badge/Status-Prototype-yellow) ![Language](https://img.shields.io/badge/Language-Japanese-red)[![License: MIT](https://img.shields.io/github/license/trgr-karasutoragara/zen-structure-4-u)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/trgr-karasutoragara/zen-structure-4-u?style=social)](https://github.com/trgr-karasutoragara/zen-structure-4-u/stargazers)
-![Last Commit](https://img.shields.io/github/last-commit/trgr-karasutoragara/zen-structure-4-u)
+![Demo](https://img.shields.io/badge/Status-Prototype-yellow) ![Language](https://img.shields.io/badge/Language-Japanese-red) ![MIT](https://img.shields.io/github/license/trgr-karasutoragara/time-space-quiz-game)
+![Stars](https://img.shields.io/github/stars/trgr-karasutoragara/time-space-quiz-game?style=social)
+![Last Commit](https://img.shields.io/github/last-commit/trgr-karasutoragara/time-space-quiz-game)
+
 
 
 <br>
