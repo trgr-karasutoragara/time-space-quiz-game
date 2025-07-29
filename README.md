@@ -5,8 +5,6 @@
 ![Stars](https://img.shields.io/github/stars/trgr-karasutoragara/time-space-quiz-game?style=social)
 ![Last Commit](https://img.shields.io/github/last-commit/trgr-karasutoragara/time-space-quiz-game)
 
-
-
 <br>
 
 
@@ -15,6 +13,8 @@
 This project was born from a common TRPG (Tabletop Role-Playing Game) scenario: **What happens when the Game Master forgets to specify the time period and location?** 
 
 Instead of breaking character, I turned this "bug" into a feature—players must now deduce the historical period and geographical location through careful observation and reasoning to survive and escape the dimensional maze.
+
+<br>
 
 ## 🎯 Concept: Active Learning Through Gamification
 
@@ -29,10 +29,14 @@ This quiz system transforms learning into an **active investigation game** where
 - **Investigation Teams** must use critical thinking and knowledge synthesis
 - **Competition dynamics** naturally emerge, driving deeper engagement
 
+<br>
+
 ## 🎮 Try It Out
 🌌 [Play the Demo](https://trgr-karasutoragara.github.io/time-space-quiz-game/)
 
 Experience the time-space labyrinth yourself! No installation required—just open in your browser and start solving temporal mysteries.
+
+<br>
 
 ## 🎮 Game Mechanics
 
@@ -47,6 +51,8 @@ Experience the time-space labyrinth yourself! No installation required—just op
 - 🗺️ **Geography**: Trade routes, colonial territories, cultural regions  
 - 🎭 **Cultural Context**: Literature, art movements, social customs
 - 🔤 **Linguistic Challenges**: Etymology, nuanced word usage (bonus rounds)
+
+<br>
 
 ## 🏗️ Technical Architecture
 
@@ -70,6 +76,8 @@ const quizDatabase = [
 - **Expert**: Subtle contradictions and linguistic traps
 - **Bonus**: Advanced language differentiation
 
+<br>
+
 ## 🎨 Design Philosophy
 
 ### Retro-Futuristic Aesthetics
@@ -82,6 +90,8 @@ const quizDatabase = [
 - **Competition**: Team-based challenges drive motivation
 - **Achievement**: Point systems and success tracking
 - **Flow State**: Balanced difficulty progression
+
+<br>
 
 ## 🌍 Educational Applications
 
@@ -97,6 +107,8 @@ const quizDatabase = [
 - **Research Skills**: Connecting scattered clues
 - **Collaborative Problem-Solving**: Team-based deduction
 
+<br>
+
 ## 🔧 Current Implementation
 
 ### Technology Stack
@@ -111,6 +123,8 @@ This prototype uses Japanese for historical/cultural content focusing on:
 - World history (Babylonian Empire, Byzantine Empire, Age of Exploration)
 - Cultural knowledge (Classical literature, art movements)
 - Linguistic nuances (English etymology, usage differentiation)
+
+<br>
 
 ## 🌱 Natural Growth
 
@@ -129,6 +143,8 @@ No roadmaps, no promises—just the hope that if people find value in this appro
 - Report what works (or doesn't) in their context
 - Build upon the concept in unexpected ways
 
+<br>
+
 ## 📚 Academic Foundation
 
 ### Learning Theory Background
@@ -137,6 +153,8 @@ This approach naturally aligns with:
 - **Problem-Based Learning**: Real scenarios require practical knowledge
 - **Gamification**: Mystery and challenge drive engagement
 - **Collaborative Discovery**: Teams work together to solve puzzles
+
+<br>
 
 ## 🤝 If You Want to Experiment
 
@@ -155,15 +173,30 @@ This approach naturally aligns with:
 - I'd love to hear about unexpected use cases
 - Document what you discover (or what breaks!)
 
+<br>
+
 ## 📄 License
 
 MIT License - Feel free to adapt, modify, and build upon this concept for educational purposes.
+
+<br>
+
+## 🔧Repository Policy
+
+- I develop prototypes with a focus on ethics.
+- There are no plans for maintenance or support.
+- The project is released under the MIT License, so feel free to modify it within the scope of the license.
+- Instead of providing support, I create new prototypes to solve emerging problems.
+
+<br>
 
 ## ⚠️ Educational Disclaimer
 
 **※This project is intended for historical and cultural education purposes only and does not endorse any specific nation, religion, or political position.**
 
 *※本プロジェクトは歴史的・文化的な教育を目的とし、特定の国家・宗教・政治的立場を推奨するものではありません。*
+
+<br>
 
 ## 🎯 Simple Vision
 
